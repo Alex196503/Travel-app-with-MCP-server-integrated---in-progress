@@ -72,6 +72,7 @@ export const FileInput = ({
             type="button"
             className=" cursor-pointer w-7 h-7 rounded-lg bg-slate-800/80 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-colors shrink-0"
             title="Clear the image"
+            data-testid="btn-removal"
             onClick={() => updateFile(null)}
           >
             ✕

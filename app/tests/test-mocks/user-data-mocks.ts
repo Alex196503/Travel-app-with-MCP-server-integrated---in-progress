@@ -75,3 +75,56 @@ export const fakeClosedTicket = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
 }
+
+export const mockedCountries = [
+  {
+    code: "ES",
+    name: "Spain",
+    capital: "Madrid",
+    region: "Europe"
+  },
+  {
+    code: "FR",
+    name: "France",
+    capital: "Paris",
+    region: "Europe"
+  },
+  {
+    code: "AN",
+    name: "Andorra",
+    capital: "Andorra la Vella",
+    region: "Europe"
+  }
+]
+
+export const existingUser = {
+  id: 1,
+  name: "Alex",
+  email: "alex@example.com",
+  avatar: "",
+  isVerified: true
+}
+
+export const invalidPasswordCases = [
+  {
+    password: "abc1",
+    message: /at least 6 characters/i,
+    rule: "min length"
+  },
+  {
+    password: "abcdef",
+    message: /at least one letter and one number/i,
+    rule: "letters only"
+  },
+  {
+    password: "123456",
+    message: /at least one letter and one number/i,
+    rule: "digits only"
+  }
+]
+
+export const successResponse = {
+  success: true,
+  message: "Profile updated successfully!",
+  user: { id: 1, name: "Alex Updated", email: "new@example.com" }
+}

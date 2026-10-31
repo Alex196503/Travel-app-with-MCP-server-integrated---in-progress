@@ -13,6 +13,7 @@ export default function PaginationComponent({
         type="button"
         disabled={currentPage <= 1}
         className="btn-control"
+        data-testid="btn-previous"
         onClick={() => setCurrentPage(currentPage - 1)}
       >
         Previous
@@ -63,6 +64,7 @@ export default function PaginationComponent({
       <button
         type="button"
         className="btn-control"
+        data-testid="btn-next"
         onClick={() => setCurrentPage(currentPage + 1)}
         disabled={currentPage === numberOfPages}
       >

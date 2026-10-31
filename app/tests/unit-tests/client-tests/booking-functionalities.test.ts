@@ -3,6 +3,7 @@ import { groupBookingsByDate } from "~/routes/home/local_components/CalendarCont
 import type { FormattedBookingForCalendar } from "~/types/feature-types"
 import {
   calculateDuration,
+  getPaginationIndexes,
   sanitizePriceValue
 } from "~/utils/frontend-utils/trip-utils"
 import {
@@ -136,7 +137,6 @@ describe("groupBookingsByDate algorithm", () => {
       }
     ] as unknown as FormattedBookingForCalendar[]
     groupBookingsByDate(map, bookings)
-    console.log(map)
     const octoberBookings = map.get("2026-06-02")
     expect(octoberBookings).toHaveLength(2)
     expect(octoberBookings?.map((booking) => booking.id)).toEqual([
@@ -146,5 +146,28 @@ describe("groupBookingsByDate algorithm", () => {
       "Journey to Monaco",
       "Short business trip to Vancouver"
     ])
+  })
+})
+
+describe("testing the pagination pure logic and edge cases", () => {
+  it("calculates correct indexes for the first page", () => {
+    const result = getPaginationIndexes(45, 1, 22)
+    expect(result.numberOfPages).toBe(3)
+    expect(result.firstIndex).toEqual(0)
+    expect(result.lastIndex).toBe(22)
+  })
+
+  it("calculates correct indexes for the last page", () => {
+    const result = getPaginationIndexes(45, 3, 22)
+    expect(result.numberOfPages).toBe(3)
+    expect(result.firstIndex).toBe(44)
+    expect(result.lastIndex).toBe(66)
+  })
+
+  it("handles empty list gracefully (fallback to one page)", () => {
+    const result = getPaginationIndexes(0, 1, 22)
+    expect(result.numberOfPages).toBe(1)
+    expect(result.firstIndex).toBe(0)
+    expect(result.lastIndex).toBe(22)
   })
 })

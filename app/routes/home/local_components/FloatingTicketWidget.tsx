@@ -7,22 +7,19 @@ import type { Ticket } from "~/types/feature-types"
 import TicketChatComponent from "./ChatComponent"
 import TicketCreationForm from "./TicketCreationForm"
 import TicketsList from "./TicketsList"
+import { useLocation } from "react-router"
 
 export default function FloatingTicketWidget() {
-  const {
-    tickets,
-    setTickets,
-    isLoading,
-    hasLoadError,
-    isAdmin
-  } = useTickets()
+  const { tickets, setTickets, isLoading, hasLoadError, isAdmin } =
+    useTickets()
   const [isOpen, setIsOpen] = useState(false)
   const [newTicketSubject, setNewTicketSubject] = useState("")
   const [isCreatingTicket, setIsCreatingTicket] = useState(false)
   const [selectedTicketId, setSelectedTicketId] = useState<
     number | null
   >(null)
-
+  const location = useLocation()
+  const isCountriesRoute = location.pathname.includes("/countries")
   const handleCreateTicket = async (
     event: FormEvent<HTMLFormElement>
   ) => {
@@ -65,7 +62,11 @@ export default function FloatingTicketWidget() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div
+      className={`fixed right-4 z-50 transition-all duration-200 ${
+        isCountriesRoute ? "bottom-20" : "bottom-3"
+      }`}
+    >
       <section
         id="live-support-panel"
         className={`mb-3 flex h-[min(42rem,calc(100dvh-6rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 text-slate-100 shadow-2xl ${
@@ -132,8 +133,9 @@ export default function FloatingTicketWidget() {
               ticketId={selectedTicketId}
               isAdmin={isAdmin}
               ticketStatus={
-                tickets.find((ticket) => ticket.id === selectedTicketId)
-                  ?.status
+                tickets.find(
+                  (ticket) => ticket.id === selectedTicketId
+                )?.status
               }
             />
           </div>
