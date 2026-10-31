@@ -26,6 +26,7 @@ import { requireAuthOnServer } from "~/utils/frontend-utils/auth-guards"
 import axios from "axios"
 import { api } from "~/axios/axios"
 import { type APIResponse } from "~/types/feature-types"
+import { getPaginationIndexes } from "~/utils/frontend-utils/trip-utils"
 
 export const meta = () =>
   getMeta("Our API", "Check some information about several countries")
@@ -101,11 +102,9 @@ export default function ApiPage() {
     const matchesRegion = hasRegion ? country.region === filter : true
     return matchesSearch && matchesRegion
   })
-  let countriesPerPage = 20
-  let numberOfPages =
-    Math.ceil(filteredCountries.length / countriesPerPage) || 1
-  let lastIndex = currentPage * countriesPerPage
-  let firstIndex = lastIndex - countriesPerPage
+
+  const { firstIndex, lastIndex, numberOfPages } =
+    getPaginationIndexes(filteredCountries.length, currentPage)
 
   const override: CSSProperties = {
     display: "block",
@@ -171,6 +170,7 @@ export default function ApiPage() {
               <input
                 type="text"
                 value={aiPrompt}
+                data-testid="aiprompt"
                 onChange={(e) => setAiPrompt(e.target.value)}
                 placeholder="Ask AI about countries (e.g., compare RO & FR)..."
                 className="w-full px-10 py-2.5 text-sm rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
@@ -180,10 +180,11 @@ export default function ApiPage() {
               type="submit"
               disabled={isCounting || isAiLoading}
               style={{ opacity: isCounting ? 0.5 : 1 }}
+              data-testid="btn-submit"
               className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold rounded-md shadow-sm bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 cursor-pointer"
             >
               {isCounting
-                ? `Sending prompt in ${formattedTime}.`
+                ? `Wait to send a prompt in ${formattedTime}.`
                 : "Send prompt."}
             </button>
           </form>

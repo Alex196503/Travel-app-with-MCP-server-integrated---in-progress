@@ -100,7 +100,6 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function EditProfilePage() {
-  const { isDark, setDark } = useThemeContext()
   const fetcher = useFetcher<ProfileRouteResponse>()
   const { user } = useAuth()
   const [defaultName, setName] = useState(user?.name || "")
@@ -123,6 +122,7 @@ export default function EditProfilePage() {
     username?: string
     email?: string
     password?: string
+    avatar?: string
   } | null>(null)
   useFormToast(fetcher.data, setErrors)
 
@@ -152,6 +152,7 @@ export default function EditProfilePage() {
       toast.info(message)
       return
     }
+
     const result = EditProfileSchema.safeParse({
       username,
       email,
@@ -164,6 +165,11 @@ export default function EditProfilePage() {
         email: fieldErrors.email?.[0],
         password: fieldErrors.password?.[0]
       })
+      return
+    }
+    const MAX_FILE_SIZE = 5 * 1024 * 1024
+    if (selectedFile && selectedFile.size > MAX_FILE_SIZE) {
+      setErrors({ avatar: "Max file size is 5MB." })
       return
     }
     setErrors(null)
@@ -207,6 +213,7 @@ export default function EditProfilePage() {
             method="POST"
             onSubmit={handleSubmit}
             encType="multipart/form-data"
+            data-testid="formEdit"
             key={formKey}
           >
             {errors && (

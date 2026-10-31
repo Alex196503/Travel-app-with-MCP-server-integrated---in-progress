@@ -23,6 +23,7 @@ export default function CountryFinder({
           {label}
         </label>
         <input
+          data-testid="custom-element"
           type={id}
           id={id}
           placeholder={label}

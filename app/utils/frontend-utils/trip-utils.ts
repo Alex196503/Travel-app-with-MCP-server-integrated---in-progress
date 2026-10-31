@@ -32,3 +32,14 @@ export const getCountryName = (countryCode: string) => {
   return regionNames.of(countryCode.toUpperCase()) || countryCode
 }
 
+//Handler function that implements the pagination algorithm within limits
+export function getPaginationIndexes(
+  totalItems: number,
+  currentPage: number,
+  itemsPerPage = 20
+) {
+  const numberOfPages = Math.ceil(totalItems / itemsPerPage) || 1
+  const lastIndex = currentPage * itemsPerPage
+  const firstIndex = lastIndex - itemsPerPage
+  return { numberOfPages, firstIndex, lastIndex }
+}
