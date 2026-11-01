@@ -1,6 +1,17 @@
 # Tourism application
 Info:(to be completed / done)
 
+## Local Docker setup
+Set `DB_PASSWORD` and `SECRET_KEY` in your untracked `.env` file before starting
+Compose. The database port is bound to `127.0.0.1`, so it is only published on
+the local machine. The backend and Prisma seed use `DB_PASSWORD` to connect.
+Use a URL-safe password (for example, generate a random hexadecimal value with
+`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`),
+because Compose also places it in Prisma's `DATABASE_URL`. If the MySQL data
+volume was initialized before setting `DB_PASSWORD`, update its existing root
+password; MySQL initialization variables do not change credentials in an
+already-initialized volume.
+
 
 ## Database schema
 Our relational database(made in SQL) follows a relational structure to manage bookings, scheduling, countries, users, ticketing and reviews. The following ERD diagram was designed in Lucidchart to map out the database arhitecture, relationships, and core functionalities before writing any SQL code or setting up the database.
