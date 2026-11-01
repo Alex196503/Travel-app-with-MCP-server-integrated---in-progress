@@ -16,10 +16,21 @@ export interface TokenService {
 
 //Class useful for generating the token using jwt library
 export class JwtTokenService implements TokenService {
+  private readonly secret: string
+
+  constructor(secret = process.env.SECRET_KEY) {
+    if (!secret?.trim()) {
+      throw new Error(
+        "SECRET_KEY must be configured before starting the server."
+      )
+    }
+    this.secret = secret
+  }
+
   generateToken(userId: string, expiresIn: SignOptions["expiresIn"]) {
     return jwt.sign(
       { id: userId },
-      process.env.SECRET_KEY || "secret_key",
+      this.secret,
       {
         expiresIn,
         algorithm: "HS256"
@@ -29,7 +40,7 @@ export class JwtTokenService implements TokenService {
   verifyToken(token: string): { id: string } {
     return jwt.verify(
       token,
-      process.env.SECRET_KEY || "secret_key"
+      this.secret
     ) as { id: string }
   }
 }

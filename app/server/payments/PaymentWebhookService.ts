@@ -29,17 +29,72 @@ class CheckoutCompletedHandler implements StripeEventHandler {
   async handle(event: Stripe.Event): Promise<void> {
     const session = event?.data.object as Stripe.Checkout.Session
     const bookingId = Number(session.metadata?.booking_id)
-    const paymentIntent = session.payment_intent as string
-    let result = await this.prisma.$transaction(async (tx) => {
-      await tx.payment.updateMany({
+    const paymentIntent =
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : session.payment_intent?.id
+    if (!Number.isInteger(bookingId) || bookingId <= 0 || !paymentIntent) {
+      throw new Error(
+        "Checkout session is missing a valid booking ID or payment intent."
+      )
+    }
+
+    const result = await this.prisma.$transaction(async (tx) => {
+      const existingPayment = await tx.payment.findUnique({
+        where: { stripe_payment_intent_id: paymentIntent }
+      })
+      if (existingPayment) {
+        if (existingPayment.booking_id !== bookingId) {
+          throw new Error(
+            "Stripe payment intent is already associated with another booking."
+          )
+        }
+        return null
+      }
+
+      const pendingPayment = await tx.payment.findFirst({
         where: {
-          booking_id: bookingId
+          booking_id: bookingId,
+          status: "PENDING",
+          stripe_payment_intent_id: null,
+          OR: [
+            { stripe_checkout_session_id: session.id },
+            { stripe_checkout_session_id: null }
+          ]
+        },
+        orderBy: [
+          { stripe_checkout_session_id: "desc" },
+          { createdAt: "desc" }
+        ]
+      })
+      if (!pendingPayment) {
+        throw new Error(
+          `No pending payment found for booking ${bookingId}.`
+        )
+      }
+
+      const paymentUpdate = await tx.payment.updateMany({
+        where: {
+          id: pendingPayment.id,
+          status: "PENDING",
+          stripe_payment_intent_id: null
         },
         data: {
           status: "SUCCEEDED",
           stripe_payment_intent_id: paymentIntent
         }
       })
+      if (paymentUpdate.count !== 1) {
+        const processedPayment = await tx.payment.findUnique({
+          where: { stripe_payment_intent_id: paymentIntent }
+        })
+        if (processedPayment?.booking_id === bookingId) {
+          return null
+        }
+        throw new Error(
+          `Could not mark payment for booking ${bookingId} as successful.`
+        )
+      }
       await tx.booking.update({
         where: { id: bookingId },
         data: { status: "CONFIRMED" }
@@ -54,7 +109,9 @@ class CheckoutCompletedHandler implements StripeEventHandler {
       })
       return newNotification
     })
-    this.notificationEmitter.emit("payment.succeeded", result)
+    if (result) {
+      this.notificationEmitter.emit("payment.succeeded", result)
+    }
   }
 }
 

@@ -1,0 +1,64 @@
+# Docker Compose configuration for the Vite project
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: tourism-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/app/app
+      - ./public:/app/public
+      - /app/node_modules
+    command: ["npm", "run", "dev:fe", "--", "--host", "0.0.0.0"]
+    env_file:
+      - .env
+    environment:
+      SERVER_API_URL: http://server:5000/api
+    depends_on:
+      - server
+    restart: unless-stopped
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: tourism-server
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app/app
+      - ./prisma:/app/prisma
+      - /app/node_modules
+    command: ["npm", "run", "dev:be"]
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DATABASE_URL: mysql://${DB_USER:-root}:${DB_PASSWORD:?Set DB_PASSWORD in .env}@db:3306/${DB_NAME:-turism_db}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    container_name: tourism-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      MYSQL_DATABASE: ${DB_NAME:-turism_db}
+    volumes:
+      - tourism-db-data:/var/lib/mysql
+    ports:
+      - "127.0.0.1:${DB_PORT:-3307}:3306"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  tourism-db-data:
