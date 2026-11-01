@@ -20,6 +20,7 @@ export const formatAmountForGateway = (
 interface IPaymentProcessor {
   createCheckoutSession(params: CreateSessionParams): Promise<{
     checkoutUrl: string
+    checkoutSessionId: string
   }>
 }
 
@@ -30,6 +31,7 @@ interface IPaymentRefundProvider {
 export class StripeProcessor implements IPaymentProcessor {
   async createCheckoutSession(params: CreateSessionParams): Promise<{
     checkoutUrl: string
+    checkoutSessionId: string
   }> {
     const unitAmountInCents = formatAmountForGateway(
       Number(params.totalPrice)
@@ -67,7 +69,8 @@ export class StripeProcessor implements IPaymentProcessor {
       }
     })
     return {
-      checkoutUrl: session.url || ""
+      checkoutUrl: session.url || "",
+      checkoutSessionId: session.id
     }
   }
 }
@@ -96,6 +99,7 @@ export class PaymentActionService {
     this.paymentRefundProvider = stripeRefundProvider
     this.notificationEmitter = notificationEmitter
   }
+  
   async processBookingPayment(bookingId: string, userId: string) {
     const booking = await this.prisma.booking.findUnique({
       where: {
@@ -119,7 +123,7 @@ export class PaymentActionService {
       )
     }
 
-    const { checkoutUrl } =
+    const { checkoutUrl, checkoutSessionId } =
       await this.paymentProcessor.createCheckoutSession({
         bookingId: booking.id,
         userId: booking.user_id,
@@ -136,6 +140,7 @@ export class PaymentActionService {
         booking_id: booking.id,
         user_id: booking.user_id,
         amount: booking.total_price,
+        stripe_checkout_session_id: checkoutSessionId,
         status: "PENDING"
       }
     })

@@ -45,8 +45,8 @@ async function main() {
       category: TripCategory.MOUNTAIN,
       description:
         "Explore breathtaking caves, dense forests, and scenic mountain trails during a week-long unforgettable outdoor expedition.",
-      start_date: new Date("2026-09-01T09:00:00Z"),
-      end_date: new Date("2026-09-07T18:00:00Z"),
+      start_date: new Date("2026-11-01T09:00:00Z"),
+      end_date: new Date("2026-11-07T18:00:00Z"),
       images: [
         {
           url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
@@ -74,8 +74,8 @@ async function main() {
       available_seats: 5,
       description:
         "An unforgettable experience on the scenic mountain trails of the Alps, featuring breathtaking landscapes and traditional cozy accommodation.",
-      start_date: new Date("2026-09-01"),
-      end_date: new Date("2026-09-07"),
+      start_date: new Date("2026-12-01"),
+      end_date: new Date("2026-12-07"),
       price: 850.0,
       images: [
         {
@@ -97,8 +97,8 @@ async function main() {
       category: TripCategory.CITY_BREAK,
       description:
         "Discover ancient history, walk through the magnificent Colosseum, and taste authentic Italian cuisine in the heart of Rome.",
-      start_date: new Date("2026-10-10T10:00:00Z"),
-      end_date: new Date("2026-10-13T20:00:00Z"),
+      start_date: new Date("2026-12-10T10:00:00Z"),
+      end_date: new Date("2026-12-13T20:00:00Z"),
       images: [
         {
           url: "https://images.unsplash.com/photo-1552832230-c0197dd311b5",
@@ -127,8 +127,8 @@ async function main() {
       category: TripCategory.BEACH,
       description:
         "Enjoy golden sand beaches, crystal clear turquoise waters, and relaxing sunny days in Lefkada.",
-      start_date: new Date("2026-07-01T08:00:00Z"),
-      end_date: new Date("2026-07-08T18:00:00Z"),
+      start_date: new Date("2026-12-22T08:00:00Z"),
+      end_date: new Date("2026-12-29T18:00:00Z"),
       images: [
         {
           url: "https://images.unsplash.com/photo-1533105079780-92b9be482077",

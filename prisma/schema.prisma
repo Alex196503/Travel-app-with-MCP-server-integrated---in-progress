@@ -107,6 +107,7 @@ model Payment {
   id Int @id @default(autoincrement())
   user_id Int
   booking_id Int
+  stripe_checkout_session_id String? @db.VarChar(255) @unique
   stripe_payment_intent_id String? @db.VarChar(255) @unique
   user User @relation(fields: [user_id], references: [id], onDelete: Restrict)
   booking Booking @relation(fields: [booking_id], references: [id], onDelete: Restrict)

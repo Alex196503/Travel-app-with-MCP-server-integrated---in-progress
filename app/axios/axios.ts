@@ -10,7 +10,9 @@ declare module "axios" {
 const baseURL =
   typeof window !== "undefined"
     ? import.meta.env.VITE_API_URL || "/api"
-    : process.env.VITE_API_URL || "http://localhost:5000/api"
+    : process.env.SERVER_API_URL ||
+      process.env.VITE_API_URL ||
+      "http://localhost:5000/api"
 
 // Create an axios instance with base URL configuration and credential support for authenticated API requests
 export const api = axios.create({
